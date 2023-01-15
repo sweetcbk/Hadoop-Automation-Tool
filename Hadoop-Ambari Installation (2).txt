@@ -1,0 +1,216 @@
+=================================================================================================
+ Hadoop-Ambari Installation Steps
+----------------------------------
+ Add 3 VM with Nat mode with 100 GB Storage 
+=================================================================================================
+ Rum these commands on All Nodes
+=================================================================================================
+[root@localhost]# hostnamectl set-hostname silver-node1
+[root@silver-node1 ambari]# vi /etc/hosts
+                            ----------------------------------
+                            ADD NODE IP & HOSTNAME THEN SAVE
+                            ----------------------------------
+                            192.168.0.1 SILVER-NODE1
+                            192.168.0.2 SILVER-NODE2
+                            192.168.0.3 SILVER-NODE3
+                            ----------------------------------                          
+                            PING FOR EACH-OTHER NODE
+                            ----------------------------------
+
+[root@silver-node1 ambari]# vi /etc/selinux/config
+                            -----------------------                            
+ 					Disabled Selinux
+                            -----------------------
+[root@silver-node1 ambari]# getenforce
+[root@silver-node1 ambari]# setenforce 0
+[root@silver-node1 ambari]# systemctl stop firewalld
+[root@silver-node1 ambari]# systemctl disable firewalld
+[root@silver-node1 ambari]# reboot
+=================================================================================================
+ Run these commands on Node-1 or Master-Node
+=================================================================================================
+[root@silver-node1 ~]# yum repolist
+[root@silver-node1 ~]# yum install httpd*
+[root@silver-node1 ~]# yum install -y apache*
+[root@silver-node1 ~]# yum install webserver*
+[root@silver-node1 ~]# systemctl status httpd
+[root@silver-node1 ~]# systemctl enable httpd.service
+[root@silver-node1 ~]# systemctl start httpd
+[root@silver-node1 ~]# systemctl status httpd
+[root@silver-node1 ~]# cd /var/www/html/
+[root@silver-node1 html]# mkdir ambari
+[root@silver-node1 ~]# cd
+[root@silver-node1 ~]# cd Downloads
+[root@silver-node1 Downloads]# cp /root/Downloads/ambari-2.7.3.0-centos7.tar.gz /var/www/html/ambari/
+[root@silver-node1 Downloads]# cd /var/www/html/ambari/
+[root@silver-node1 ambari]# tar -xvf ambari-2.7.3.0-centos7.tar.gz 
+[root@silver-node1 ambari]# cp /var/www/html/ambari/ambari/centos7/2.7.3.0-139/ambari.repo /etc/yum.repos.d/
+[root@silver-node1 ambari]# yum install -y createrepo
+
+-----------------------------------------------------
+if this command not working then follow these steps
+-----------------------------------------------------
+
+[root@silver-node1 ambari]# cd /etc/yum.repos.d/
+[root@silver-node1 yum.repos.d]# mv ambari.repo ambari
+[root@silver-node1 yum.repos.d]# ll
+[root@silver-node1 yum.repos.d]# yum -y install repolist
+[root@silver-node1 yum.repos.d]# yum -y install createrepo
+[root@silver-node1 yum.repos.d]# mv ambari ambari.repo
+[root@silver-node1 yum.repos.d]# cat /etc/yum.repos.d//ambari.repo 
+[root@silver-node1 ambari]# createrepo /var/www/html/ambari/ambari/
+
+
+
+[root@silver-node1 ambari]# vi /etc/yum.repo.d/ambari.repo
+--------------------------------------------------------------------------------------------------------------------
+#VERSION_NUMBER=2.7.3.0-139
+[ambari-2.7.3.0]
+#json.url = http://public-repo-1.hortonworks.com/HDP/hdp_urlinfo.json
+name=ambari Version - ambari-2.7.3.0
+baseurl=http://master/ambari/ambari/centos7/2.7.3.0-139/
+gpgcheck=0
+#gpgkey=http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.7.3.0/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1
+---------------------------------------------------------------------------------------------------------------------
+save file
+---------------------------------------------------------------------------------------------------------------------
+
+[root@silver-node1 ambari]# check repolist
+[root@silver-node1 ambari]# scp /etc/yum.repos.d/ambari.repo root@silver-node2:/etc/yum.repos.d/   ( command for sending files for other node  )
+[root@silver-node1 ambari]# scp /etc/yum.repos.d/ambari.repo root@silver-node3:/etc/yum.repos.d/   ( command for sending files for other node  )
+[root@silver-node1 ambari]# rsync /etc/hosts root@silver.node2:/etc/hosts                                         //
+[root@silver-node1 ambari]# rsync /etc/hosts root@silver.node2:/etc/hosts                                         //
+
+
+[root@silver-node1 ambari]# yum install ambari-server               (install only node1)
+[root@silver-node1 ambari]# ambari-server setup -s
+[root@silver-node1 ambari]# ambari-server status
+[root@silver-node1 ambari]# ambari-server start
+[root@silver-node1 ambari]# ambari-server status
+[root@silver-node1 ambari]# yum install -y ambari-agent            ("install on all nodes")
+[root@silver-node1 ambari]# ambari-agent start
+[root@silver-node1 ambari]# ambari-agent status
+[root@silver-node1 ambari]# systemctl status firewalld              ("install on all nodes")    
+[root@silver-node1 ambari]# systemctl stop firewalld.service
+[root@silver-node1 ambari]# systemctl status firewalld
+
+
+[root@silver-node1 ambari]# vi /etc/ambari-agent/conf/ambari-agent.ini     
+------------------------------------------------------
+(edit server-> localhost to "silver-node1" then save)
+------------------------------------------------------
+[root@silver-node1 ~]# rsync /etc/ambari-agent/conf/ambari-agent.ini root@silver-node2:/etc/ambari-agent/conf/ambari-agent.ini
+[root@silver-node1 ~]# rsync /etc/ambari-agent/conf/ambari-agent.ini root@silver-node3:/etc/ambari-agent/conf/ambari-agent.ini 
+         
+[root@silver-node1 ambari]# ambari-agent restart          ("install on all nodes")  
+[root@silver-node1 ambari]# ambari-agent status            ("install on all nodes")  
+
+-------------------------------------------------------------------------------------
+URL:- silver-node1:8080/#/login  (one link on web browser on all nodes)             
+  id:- admin
+  pass:- admin
+-------------------------------------------------------------------------------------
+
+[root@silver-node1 ambari]# systemctl status ntp
+[root@silver-node1 ambari]# yum install -y ntp
+[root@silver-node1 ambari]# systemctl status ntpd
+[root@silver-node1 ambari]# systemctl enable ntpd.service
+[root@silver-node1 ambari]# systemctl start ntpd.service
+[root@silver-node1 ambari]# systemctl status ntpd
+[root@silver-node1 ambari]# cd /var/www/htm/
+[root@silver-node1 html]# mkdir hdp
+[root@silver-node1 html]# cd hdp
+
+[root@silver-node1 hdp]# tar -xvf /root/Documents/HDP3.0
+[root@silver-node1 hdp]# tar -xvf /root/Documents/HDP-UTILS
+
+[root@silver-node1 hdp]# createrepo HDP
+[root@silver-node1 hdp]# createrepo HDP-UTILS
+[root@silver-node1 hdp]# cp /var/www/html/hdp/HDP/centos7/3.1.0/hdp.repo /etc/yum.repo.d/
+[root@silver-node1 hdp]# yum repolist
+[root@silver-node1 hdp]# vi /etc/yum.repos.d/hdp.repo
+--------------------------------------------------------------------------------------------------------------- 
+                         edit file
+---------------------------------------------------------------------------------------------------------------
+#VERSION_NUMBER=3.1.0.0-78
+[HDP-3.1.0.0]
+name=HDP Version - HDP-3.1.0.0
+baseurl=http://master/hdp/HDP/centos7/3.1.0.0-78/
+gpgcheck=0
+#gpgkey=http://public-repo-1.hortonworks.com/HDP/centos7/3.x/updates/3.1.0.0/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1
+
+
+[HDP-UTILS-1.1.0.22]
+name=HDP-UTILS Version - HDP-UTILS-1.1.0.22
+baseurl=http://master/hdp/HDP-UTILS/centos7/1.1.0.22/
+gpgcheck=0
+#gpgkey=http://public-repo-1.hortonworks.com/HDP/centos7/3.x/updates/3.1.0.0/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1
+---------------------------------------------------------------------------------------------------------------
+
+[root@master hdp]# cd /usr/lib/ambari-server/web/javascripts/
+[root@master hdp]# vi app.js
+
+--------------------------------------------------------------------
+Reference Website:-> https://www.cnblogs.com/nshuai/p/13404273.html
+
+Goto Line number:- 39892 & replace file
+--------------------------------------------------------------------
+Change the line from :
+-----------------------
+  /**
+   * Use Local Repo if some network issues exist
+   */
+  onNetworkIssuesExist: function () {
+    if (this.get('networkIssuesExist')) {
+      this.get('content.stacks').forEach(function (stack) {
+          stack.setProperties({
+            usePublicRepo: false,
+            useLocalRepo: true
+          });
+          stack.cleanReposBaseUrls();
+      });
+    }
+  }.observes('networkIssuesExist'),
+
+-----
+ to
+-----
+
+  /**
+   * Use Local Repo if some network issues exist
+   */
+  onNetworkIssuesExist: function () {
+    if (this.get('networkIssuesExist')) {
+      this.get('content.stacks').forEach(function (stack) {
+        if(stack.get('useLocalRepo') != true){
+          stack.setProperties({
+            usePublicRepo: false,
+            useLocalRepo: true
+          });
+          stack.cleanReposBaseUrls();
+        } 
+      });
+    }
+  }.observes('networkIssuesExist'),
+-------------------------------------------------------------------
+
+[root@master hdp]# ambari-server stop
+[root@master hdp]# ambari-server reset
+[root@master hdp]# ambari-server start
+[root@master hdp]# ambari-agent restart
+----------------------------------------------------
+Download SQL Redhat7 File through Ambari Dashboard
+----------------------------------------------------
+[root@master hdp]# rpm -ivh /root/Downloads/mysql-connector-j-8.0.31-1.el7.noarch.rpm 
+[root@master hdp]# ambari-server setup --jdbc-db=mysql --jdbc-driver=/usr/share/java/mysql-connector-j.jar
+
+
+
+
+
