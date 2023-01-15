@@ -7,7 +7,7 @@
 2:-> HDP-3.1.0.0-centos7-rpm.tar.gz         [File Size: 8.44 GB]
 3:-> HDP-UTILS-1.1.0.22-centos7.tar.gz      [File Size: 87.4 MB]
  ⬇ ⬇ ⬇ Hadoop all Files Download Link:- ⬇ ⬇ ⬇
-https://drive.google.com/drive/folders/1CF2EXuDjMWjZyNKUl2wnLMlfb20QSeGT?usp=sharing
+🖥️ https://drive.google.com/drive/folders/1CF2EXuDjMWjZyNKUl2wnLMlfb20QSeGT?usp=sharing
 =================================================================================================
  Rum these commands on All Nodes
 =================================================================================================
