@@ -6,3 +6,8 @@ https://drive.google.com/drive/folders/1y1JxL1aHsx0M1skb1iIS9QxuTtIpyGPE?usp=sha
 2:-> Hard Disk 200GB each Virtual Machine/Base Machine<br>
 3:-> All Downloaded File Move on /root/Downloads Folder<br>
 4:-> Run Commands
+
+- 📫 for more information and contact
+- 🖥️ My Website  :- https://chandrabhushan.in
+-  🤖 LinkedIn   :- https://www.linkedin.com/in/sweetcbk
+-  🤖 Twitter    :- https://twitter.com/sweetcbk
